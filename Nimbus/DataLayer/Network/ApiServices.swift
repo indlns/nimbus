@@ -10,6 +10,7 @@ import Foundation
 class ApiServices: NSObject {
     func getWeatherData(completion : @escaping (WeatherModel) -> ()) {
         var request = URLRequest(url: URL(string: Constants.API.baseURL)!)
+        request.httpMethod = "GET"
         request.addValue(Constants.API.apiKey, forHTTPHeaderField: "X-Yandex-API-Key")
         
         URLSession.shared.dataTask(with: request) { (data, urlResponce, error) in
@@ -18,8 +19,10 @@ class ApiServices: NSObject {
                     let jsonDecoder = JSONDecoder()
                     let weatherData = try jsonDecoder.decode(WeatherModel.self,
                                                          from: data)
-                    print("12312312312", weatherData, urlResponce)
-                    completion(weatherData)
+                    
+                    DispatchQueue.main.async {
+                        completion(weatherData)
+                    }
                     
                 } catch {
                     print(error.localizedDescription)
