@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 class WeatherViewController: UIViewController {
-
+    
     // MARK: UI
     
     private lazy var imageView: UIImageView = UIImageView().apply {
@@ -20,6 +20,7 @@ class WeatherViewController: UIViewController {
         $0.font = .systemFont(ofSize: 16, weight: .regular)
         $0.textAlignment = .center
         $0.numberOfLines = 0
+        $0.text = DateHelper.shared.currentDateString()
         $0.sizeToFit()
     }
     
@@ -40,8 +41,20 @@ class WeatherViewController: UIViewController {
         $0.font = .systemFont(ofSize: 32, weight: .regular)
         $0.textAlignment = .center
         $0.numberOfLines = 0
+        $0.text = "Yekaterinburg"
         $0.sizeToFit()
     }
+    
+    private lazy var weatherContentView: UIView = UIView().apply {
+        $0.backgroundColor = .white
+        $0.alpha = 0.5
+        $0.roundedView(corners: [.layerMaxXMaxYCorner,
+                                 .layerMinXMaxYCorner,
+                                 .layerMinXMinYCorner,
+                                 .layerMaxXMinYCorner])
+    }
+    
+    private var weatherViewModel: WeatherViewModel!
     
     // MARK: Life Cycle
     
@@ -51,8 +64,7 @@ class WeatherViewController: UIViewController {
         layout()
         setupViews()
         setupNavigationBar()
-        setupLabels()
-        
+        viewUpdate()
     }
     
     private func addSubviews() {
@@ -60,7 +72,8 @@ class WeatherViewController: UIViewController {
          titleLabel,
          temperatureLabel,
          degreeLabel,
-         cityLabel].forEach({ view.addSubview($0)})
+         cityLabel,
+         weatherContentView].forEach({ view.addSubview($0)})
     }
     
     // MARK: Setup Views
@@ -76,15 +89,21 @@ class WeatherViewController: UIViewController {
         imageView.image = UIImage(named: "rain")
     }
     
-    private func setupLabels() {
-        titleLabel.text = DateHelper.shared.currentDateString()
-        temperatureLabel.text = "20"
-        cityLabel.text = "Yekaterinburg"
+    private func viewUpdate() {
+        self.weatherViewModel = WeatherViewModel()
+        self.weatherViewModel.bindViewModelToController = {
+            guard let weatherData = self.weatherViewModel.weatherData else { return }
+            self.setupLabel(temp: weatherData.fact.temp)
+        }
+    }
+    
+    private func setupLabel(temp: Int) {
+        temperatureLabel.text = "\(temp)"
     }
     
     // MARK: Actions
     
-   @objc private func searchAction() {
+    @objc private func searchAction() {
         print("tap tap")
     }
     
@@ -113,9 +132,16 @@ class WeatherViewController: UIViewController {
         }
         
         cityLabel.snp.makeConstraints {
-            $0.top.equalTo(temperatureLabel.snp.bottom).offset(106)
+            $0.top.equalTo(temperatureLabel.snp.bottom).offset(86)
             $0.left.equalToSuperview().offset(40)
             $0.right.equalToSuperview().inset(40)
+        }
+        
+        weatherContentView.snp.makeConstraints {
+            $0.left.equalToSuperview().offset(20)
+            $0.right.equalToSuperview().inset(20)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-20)
+            $0.height.equalTo(200)
         }
     }
 }
