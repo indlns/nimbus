@@ -12,8 +12,32 @@ class WeatherViewController: UIViewController {
 
     // MARK: UI
     
+    private lazy var imageView: UIImageView = UIImageView().apply {
+        $0.contentMode = .scaleAspectFill
+    }
+    
     private lazy var titleLabel: UILabel = UILabel().apply {
-        $0.font = .systemFont(ofSize: 62, weight: .medium)
+        $0.font = .systemFont(ofSize: 16, weight: .regular)
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+        $0.sizeToFit()
+    }
+    
+    private lazy var temperatureLabel: UILabel = UILabel().apply {
+        $0.font = .systemFont(ofSize: 186, weight: .bold)
+        $0.textAlignment = .center
+        $0.sizeToFit()
+    }
+    
+    private lazy var degreeLabel: UILabel = UILabel().apply {
+        $0.font = .systemFont(ofSize: 16, weight: .regular)
+        $0.textAlignment = .center
+        $0.text = Constants.Weather.degreeSymbol
+        $0.sizeToFit()
+    }
+    
+    private lazy var cityLabel: UILabel = UILabel().apply {
+        $0.font = .systemFont(ofSize: 32, weight: .regular)
         $0.textAlignment = .center
         $0.numberOfLines = 0
         $0.sizeToFit()
@@ -32,36 +56,66 @@ class WeatherViewController: UIViewController {
     }
     
     private func addSubviews() {
-        [titleLabel].forEach({ view.addSubview($0)})
+        [imageView,
+         titleLabel,
+         temperatureLabel,
+         degreeLabel,
+         cityLabel].forEach({ view.addSubview($0)})
     }
     
     // MARK: Setup Views
     
     private func setupNavigationBar() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(systemItem: .search)
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .search,
+                                                            target: self,
+                                                            action: #selector(searchAction))
     }
     
     private func setupViews() {
         view.backgroundColor = .white
+        imageView.image = UIImage(named: "rain")
     }
     
     private func setupLabels() {
         titleLabel.text = DateHelper.shared.currentDateString()
+        temperatureLabel.text = "20"
+        cityLabel.text = "Yekaterinburg"
     }
     
     // MARK: Actions
     
-    private func searchAction() {
+   @objc private func searchAction() {
         print("tap tap")
     }
     
     // MARK: Layout
     
     private func layout() {
+        imageView.snp.makeConstraints {
+            $0.top.left.right.bottom.equalToSuperview()
+        }
+        
         titleLabel.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(80)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(11)
             $0.left.equalToSuperview().offset(20)
             $0.right.equalToSuperview().inset(20)
+        }
+        
+        temperatureLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+        }
+        
+        degreeLabel.snp.makeConstraints {
+            $0.centerY.equalTo(temperatureLabel).offset(-42)
+            $0.left.equalTo(temperatureLabel.snp.right).offset(5)
+            $0.right.lessThanOrEqualToSuperview().inset(20)
+        }
+        
+        cityLabel.snp.makeConstraints {
+            $0.top.equalTo(temperatureLabel.snp.bottom).offset(106)
+            $0.left.equalToSuperview().offset(40)
+            $0.right.equalToSuperview().inset(40)
         }
     }
 }
