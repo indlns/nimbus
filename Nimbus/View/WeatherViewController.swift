@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 class WeatherViewController: UIViewController {
-
+    
     // MARK: UI
     
     private lazy var imageView: UIImageView = UIImageView().apply {
@@ -43,6 +43,8 @@ class WeatherViewController: UIViewController {
         $0.sizeToFit()
     }
     
+    private var weatherViewModel: WeatherViewModel!
+    
     // MARK: Life Cycle
     
     override func viewDidLoad() {
@@ -52,7 +54,7 @@ class WeatherViewController: UIViewController {
         setupViews()
         setupNavigationBar()
         setupLabels()
-        
+        viewUpdate()
     }
     
     private func addSubviews() {
@@ -82,9 +84,16 @@ class WeatherViewController: UIViewController {
         cityLabel.text = "Yekaterinburg"
     }
     
+    private func viewUpdate() {
+        self.weatherViewModel = WeatherViewModel()
+        self.weatherViewModel.bindViewModelToController = {
+            
+        }
+    }
+    
     // MARK: Actions
     
-   @objc private func searchAction() {
+    @objc private func searchAction() {
         print("tap tap")
     }
     
